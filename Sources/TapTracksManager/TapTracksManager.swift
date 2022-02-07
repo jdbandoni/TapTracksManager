@@ -41,7 +41,7 @@ public final class TapTracksManager: NSObject {
 extension TapTracksManager: UIGestureRecognizerDelegate {
     public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
         let tapTrack = TapTrack(timestamp: Date().timeIntervalSince1970, coordinates: touch.location(in: touch.view))
-        storer.save(tapTrack: tapTrack)
+        storer.save(tapTrack: tapTrack, completion: {})
         return false
     }
 
@@ -51,7 +51,9 @@ extension TapTracksManager: UIGestureRecognizerDelegate {
 
 private extension TapTracksManager {
     @objc func appMovedToBackground() {
-        logger.log(tapTracks: storer.load())
+        storer.load { [weak self] tapTracks in
+            self?.logger.log(tapTracks: tapTracks)
+        }
     }
 }
 
